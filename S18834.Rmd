@@ -1,0 +1,130 @@
+---
+title: "ST405_Mini_Project"
+author: "S/18/834"
+date: "2024-05-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(CCA)
+library(CCP)
+library(candisc)
+library(skimr)
+library(MASS)
+```
+
+```{r}
+credit_card_clients<-read_csv("../Data/credit_card_clients.csv")
+```
+
+```{r}
+skim(travel_reviews)
+skim(credit_card_clients)
+head(credit_card_clients)
+```
+
+```{r}
+new_column_names <- c("UserID", "ArtGalleries", "DanceClubs", "juiceBars", "Restaurants", "Museums", "Resorts", "PicnicSpots", "Beach", "Theatres", "ReligPlace")
+
+names(travel_reviews)<-new_column_names
+
+
+travel_reviews<-travel_reviews[,-1]
+
+travel_reviews<-apply(travel_reviews,2,scale)
+colnames(travel_reviews)
+
+
+credit_card_clients<-credit_card_clients[,-c(1:12)]
+credit_card_clients<-credit_card_clients[,-13]
+head(credit_card_clients)
+skim(credit_card_clients)
+
+credit_card_clients<-apply(credit_card_clients,2,scale)
+
+```
+
+```{r}
+# Set 1: Relaxed and Calm
+relaxed <- travel_reviews[, c("ArtGalleries", "juiceBars", "Museums", "PicnicSpots", "ReligPlace")]
+
+# Set 2: Energetic and Lively
+lively <- travel_reviews[, c("DanceClubs", "Restaurants", "Theatres", "Resorts", "Beach")]
+
+# Subset the data into two sets
+bill_data <- credit_card_clients[, c("BILL_AMT1", "BILL_AMT2", "BILL_AMT3", "BILL_AMT4", "BILL_AMT5", "BILL_AMT6")]
+payment_data <- credit_card_clients[, c("PAY_AMT1", "PAY_AMT2", "PAY_AMT3", "PAY_AMT4", "PAY_AMT5", "PAY_AMT6")]
+
+```
+
+```{r}
+matcor(bill_data,payment_data)
+
+```
+
+
+```{r}
+# Perform canonical correlation analysis
+cc_model <- cc(bill_data, payment_data)
+
+# Display the canonical correlations
+print("Canonical Correlations:")
+cc_model$cor
+
+
+p.asym <- p.asym(cc_model$cor, nrow(bill_data), ncol(bill_data), ncol(payment_data))
+
+
+```
+
+```{r}
+# Wilks' Lambda test for significance of canonical correlations
+p.asym(cc_model$cor, nrow(bill_data),ncol(bill_data),ncol(payment_data), tstat = "Wilks")
+
+```
+
+```{r}
+# hotelling  test for significance of canonical correlations
+p.asym(cc_model$cor, nrow(bill_data),ncol(bill_data),ncol(payment_data), tstat = "Hotelling")
+```
+
+```{r}
+# Pillai test for significance of canonical correlations
+p.asym(cc_model$cor, nrow(bill_data),ncol(bill_data),ncol(payment_data), tstat = "Pillai")
+```
+
+```{r}
+# Roy test for significance of canonical correlations
+p.asym(cc_model$cor, nrow(bill_data),ncol(bill_data),ncol(payment_data), tstat = "Roy")
+```
+
+```{r}
+Wilks(cancor(bill_data,payment_data))
+```
+
+```{r}
+cc_model$cor^2
+```
+```{r}
+cc_model$xcoef
+```
+
+```{r}
+cc_model$ycoef
+```
+
+```{r}
+loadings<-comput(bill_data,payment_data,cc_model)
+
+loadings$corr.X.xscores
+loadings$corr.Y.yscores
+loadings$corr.X.yscores
+loadings$corr.Y.xscores
+```
+
+
