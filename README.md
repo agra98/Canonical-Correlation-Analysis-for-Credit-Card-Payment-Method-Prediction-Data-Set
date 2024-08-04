@@ -1,1 +1,2 @@
 # Canonical-Correlation-Analysis-for-Credit-Card-Payment-Method-Prediction-Data-Set
+This project uses Canonical Correlation Analysis (CCA) to explore the relationships between bill data and payment data within the "Credit Card Payment Method Prediction Data Set" from the UCI Machine Learning Repository. The dataset includes detailed information on credit amounts, demographics, payment history, bill statements, and previous payments, allowing for a comprehensive analysis of factors influencing credit card default.
